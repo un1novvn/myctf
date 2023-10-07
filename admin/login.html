@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Page Title</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <!-- Include your custom CSS file -->
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <!-- Include your custom CSS file -->
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <div id="message-box" class="alert alert-info">
+        <span id="message">This is a sliding message box.</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div class="container">
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <h2>Login</h2>
+                        </div>
+                        <div class="card-body">
+                            <!-- Login Form -->
+                            <form id="admin-login-form">
+                                <div class="form-group">
+                                    <label for="username">Username:</label>
+                                    <input type="text" id="username" name="username" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password:</label>
+                                    <input type="password" id="password" name="password" class="form-control" required>
+                                </div>
+                                <!-- reCAPTCHA -->
+                                <div class="form-group">
+                                    <input type="button" id="submit" value="Login" class="btn btn-primary">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/jquery-3.7.1.min.js"></script>
+    <script src="../js/popper-2.5.3.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="adminjs.js" type="module"></script>
+    <script>
+        var adminLoggined = localStorage.getItem('adminLoggined');
+        if (adminLoggined === 'true') {
+            window.location.href = 'index.html'
+        }
+    </script>
+</body>
+</html>

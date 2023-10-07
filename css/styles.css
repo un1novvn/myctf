@@ -1,0 +1,57 @@
+/* CSS for the loading indicator */
+.spinner {
+    display: none; /* Initially hide the indicator */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    padding-top: 20%; /* Adjust as needed to vertically center content */
+    z-index: 9999; /* Set a high z-index to ensure it's above other elements */
+}
+
+
+/* custom-styles.css */
+#message-box {
+    position: fixed;
+    top: 10px;
+    right: -300px; /* Start it off-screen to the right */
+    width: 300px;
+    z-index: 9999;
+    background-color: rgb(255, 243, 205);
+    color: #000000;
+    /* border-radius: 5px; */
+    transition: right 0.5s ease; /* Apply a transition for the right property */
+}
+#message-box.show {
+    right: 10px; /* Move it to the right edge of the screen */
+}
+
+
+/* Custom style for the top part */
+.custom-top {
+    background-color: rgb(250, 250, 250); /* Grey background color */
+    padding: 20px 0; /* Vertical padding */
+}
+
+
+.challenge {
+    background-color: #f0f0f0; /* Box background color */
+    border: 1px solid #ccc; /* Box border */
+    padding: 10px; /* Box padding */
+    height: 100px;
+    width: 170px;
+    margin-right: 10px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    display: inline-block;
+
+    /* 如果没有这个， flex的inline-block 同一行时有的会出现错位*/
+    vertical-align: top;
+}
+.challenge:hover{
+    box-shadow: 10px 10px 10px -4px rgba(0,0,0,.3);
+    cursor: pointer;
+}

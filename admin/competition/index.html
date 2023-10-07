@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Page Title</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <!-- Include your custom CSS file -->
+    <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body>
+<!-- Modal -->
+
+    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="modal-new-challenge">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">New Challenge</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div style="margin: 5%;">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="new-challenge-name">Name</span>
+                    </div>
+                    <input type="text" class="form-control" aria-label="new-challenge-name" aria-describedby="new-challenge-name" id="text-name" required>
+                </div>
+
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="new-challenge-type">Type</span>
+                    </div>
+                    <input type="text" class="form-control" aria-label="new-challenge-type" aria-describedby="new-challenge-type" id="text-type" required>
+                </div>
+
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" >Description</span>
+                    </div>
+                    <textarea class="form-control" aria-label="With textarea" id="text-description"></textarea>
+                </div>
+
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Flag</span>
+                    </div>
+
+                    <input type="text" class="form-control" aria-label="flag" id="text-flag">
+
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <input type="checkbox" aria-label="Checkbox for following text input" id="dynamic-flag">
+                            <div style="margin-left: 5%;">Dynamic</div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Score</span>
+                    </div>
+
+                    <input type="text" class="form-control" aria-label="score" id="text-score">
+
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <input type="checkbox" aria-label="Checkbox for following text input" id="dynamic-score">
+                            <div style="margin-left: 5%;">Dynamic</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="new-challenge-dockerurl">Docker-Url</span>
+                    </div>
+                    <input type="text" class="form-control" aria-label="new-challenge-dockerurl" aria-describedby="new-challenge-dockerurl" id="text-dockerurl" required>
+                </div>
+
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Attachment-Urls</span>
+                    </div>
+
+                    <textarea type="text" class="form-control" aria-label="score" id="text-attachment" placeholder="urls should be divided with \n"></textarea>
+                </div>
+
+
+            </div>
+
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="new-challenge-submit">New</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    
+    </div>
+    </div>
+
+    <!-- ----------------------------------------------------- modal-new-competition -------------------------------------------------------- -->
+
+
+    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="modal-new-competition">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+    
+                <div class="modal-header">
+                    <h5 class="modal-title">New Competition</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                
+                <div style="margin: 5%;">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="new-competition-name">Name</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="new-challenge-name" aria-describedby="new-challenge-name" id="text-name" required>
+                    </div>
+    
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="new-challenge-desc">Description</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="new-challenge-type" aria-describedby="new-challenge-type" id="text-type" required>
+                    </div>
+    
+                </div>
+    
+    
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="new-challenge-submit">New</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+    
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ------------------------------------------------------------------------------------------------------------- -->
+
+    <div id="loading-indicator" class="spinner">
+        <!-- You can customize the loading indicator content here -->
+        Loading...
+    </div>
+
+    <!-- ------------------------------------------------------------------------------------------------------------- -->
+
+
+    <div id="message-box" class="alert alert-info">
+        <span id="message">This is a sliding message box.</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Admin Panel</a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="">Competition</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../user">User</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#Exit">Exit</a>
+                </li>
+            </ul>
+        </div>
+
+    </nav>
+
+    <div class="container" id="main-area">
+        <div id="content1" style="margin-top: 5%;">
+
+            <div style="border-bottom: 1px rgb(223, 223, 223) solid; padding-left: 1%;">
+                <a class="badge badge-primary" href="#" id="new">New</a>
+
+            </div>
+
+            <div class="row justify-content-center">
+
+                <!-- title为challenges时，这里保存competition-id -->
+
+                <h5 id="title">All Competitions</h5>
+            </div>
+
+            <div id="content">
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Include Bootstrap and jQuery JavaScript -->
+    <script src="../../js/jquery-3.7.1.min.js"></script>
+    <script src="../../js/popper-2.5.3.min.js"></script>
+    <script src="../../js/bootstrap.min.js"></script>
+    <script src="../adminjs.js" type="module"></script>
+
+    <script type="module">
+        // var adminLoggined = localStorage.getItem('adminLoggined');
+        // if (adminLoggined !== 'true') {
+        //     window.location.href = '../login.html'
+        // }
+
+        import * as functions from "../../js/functions.js";
+        import {route} from "../../js/route.js";
+        import * as listener from "../listener.js";
+        var competitionListItem;
+        var challengeListItem;
+        var token = localStorage.getItem("token");
+
+        $.get('challenge-list-item.html', function(data) {
+            challengeListItem = data;
+        });
+        
+        $.get('competition-list-item.html', function(data) {
+            competitionListItem = data;
+        });
+        function showAllCompetitions(){
+                var _content = $('#content');
+
+                functions.showLoadingSpinner()
+                _content.fadeOut('fast', function() {
+
+                    _content.empty();
+
+                    $.ajax({
+                        url: route.getCompetitions,
+                        method: 'GET',
+                        dataType: 'json',
+                        headers: {
+                            'Authorization': 'Bearer ' + token,
+                            'Content-Type':'application/json'
+                        },
+                        success: function(res) {
+                            var competitions = res.data;
+
+                            var _container = $('<div class="container"><ul class="list-group list-group-flush" id="competition-ul"></ul></div>')
+                            var _competitionUl = _container.find('#competition-ul');
+                            competitions.forEach(function(competition){
+
+                                var _competition = $(competitionListItem);
+
+                                var _competitionName = _competition.find('#competition-name');
+                                var _startEnd = _competition.find('#competition-start-end');
+
+                                var _options = _competition.find('.col-1');
+
+                                _competitionName.text(competition.name);
+                                _startEnd.html(`<span class="badge badge-success">start</span>${functions.formatDate(competition.start)} <span class="badge badge-danger">end</span>${functions.formatDate(competition.end)}`);
+
+                                _options.attr('competition-id',competition.uuid);
+
+                                _competition.appendTo(_competitionUl)
+
+                            });
+                            _container.appendTo(_content);
+                            functions.hideLoadingSpinner();
+                            addChallengesListener();
+                        },
+                        error: function(data) {
+                            functions.showMessage(data.responseJSON.msg,'red');
+                        }
+                    });
+
+                    _content.fadeIn('fast');
+                });
+
+        }
+
+        function addEditChallengeListener(){
+            var competitionId = $('#title').attr("competition-id");
+
+            $('.edit').click(function(){
+                var challengeId = $(this).attr('challenge-id');
+                var _modal = $('#modal-new-challenge');
+
+                $.ajax({//获取赛题信息
+                    url: route.getOneChallenge.replace('{cuuid}',competitionId).replace('{uuid}',challengeId),
+                    method: 'GET',
+                    dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type':'application/json'
+                    },
+                    success: function(res) {
+
+                        var challenge = res.data[0];
+                        _modal.find('#text-name').val(challenge.name);
+                        _modal.find('#text-description').val(challenge.desc);
+                        _modal.find('#text-type').val(challenge.type);
+                        _modal.find('#text-score').val(challenge.score);
+                        _modal.find('#text-dockerurl').val(challenge.dockerurl);
+                        _modal.find('#dynamic-score').prop('checked',challenge.dynamicscore);
+                        _modal.find('#text-flag').val(challenge.flag?challenge.flag:'');
+                        _modal.find('#dynamic-flag').prop('checked',challenge.hasContainer);
+                        _modal.find('#text-flag').attr('disabled',challenge.hasContainer);
+
+                        var attachments = ''
+                        challenge.attachmenturls.forEach(function(url){
+                            attachments += url+'\n'
+                        });
+                        _modal.find('#text-attachment').val(attachments);
+                        _modal.find('.modal-title').text('Edit Challenge');
+                        _modal.find('#new-challenge-submit').text('Edit');
+                        _modal.find('#new-challenge-submit').attr('challenge-id',challengeId);
+                        _modal.modal('show')
+
+                        functions.hideLoadingSpinner();
+                    },
+                    error: function(data) {
+                        functions.showMessage(data.responseJSON.msg,'red');
+                        functions.hideLoadingSpinner();
+                    }
+                });
+
+
+            });
+
+
+        }
+
+        //监听challenges按钮
+        function addChallengesListener(){
+
+            var _content = $("#content");
+            $(".challenges").click(function(){
+
+                var _challenge = $(this);
+                var competitionId = _challenge.attr('competition-id');
+               
+                $('#title').text("challenges");
+                $('#title').attr("competition-id",competitionId);
+                functions.showLoadingSpinner()
+                _content.fadeOut('fast', function() {
+
+                    _content.empty();
+
+                    $.ajax({
+                        url: route.getChallenges.replace('{uuid}',competitionId),
+                        method: 'GET',
+                        dataType: 'json',
+                        headers: {
+                            'Authorization': 'Bearer ' + token,
+                            'Content-Type':'application/json'
+                        },
+                        success: function(res) {
+                            var challenges = res.data;
+
+                            var _container = $('<div class="container"><ul class="list-group list-group-flush" id="challenge-ul"></ul></div>')
+                            var _challengeUl = _container.find('#challenge-ul');
+                            challenges.forEach(function(challenge){
+
+                                var _challenge = $(challengeListItem);
+                                var _challengeType = _challenge.find('#challenge-type');
+                                var _challengeName = _challenge.find('#challenge-name');
+                                var _options = _challenge.find('.col-1');
+
+                                _challengeType.html(`<span class="badge badge-primary">${challenge.type}</span>`);
+                                _challengeName.text(challenge.name);
+                                _options.attr('challenge-id',challenge.uuid);
+                                _challenge.appendTo(_challengeUl)
+
+                            });
+                            _container.appendTo(_content);
+
+                            //添加edit按钮监听
+                            addEditChallengeListener();
+                            functions.hideLoadingSpinner();
+                        },
+                        error: function(data) {
+                            functions.showMessage(data.responseJSON.msg,'red');
+                            functions.hideLoadingSpinner();
+                        }
+                    });
+
+                    _content.fadeIn('fast');
+                });
+            });
+
+        }
+
+        //new 按钮的监听
+        function addNewListener(){
+            $("#new").click(function(){
+
+                if($('#title').text().match('challenges')){//新建challenge
+
+                    var _modal = $("#modal-new-challenge");
+                    _modal.find('.modal-title').text('New Challenge')
+                    _modal.find('#new-challenge-submit').text('New');
+                    _modal.modal('show');
+                }else{//新建competition
+
+
+
+
+                }
+
+            });
+        }
+
+        function addDynamicListener(){
+            $('#dynamic-flag').on('change', function() {
+                var _flag = $('#text-flag').attr('disabled',true);
+                if($(this).is(':checked')) {
+                    _flag.attr('disabled',true);
+                } else {
+                    _flag.attr('disabled',false);
+                }
+            });
+        }
+
+        //模态框关闭时清空内容
+        function addModalHideListener(){
+            var _modal = $('#modal-new-challenge')
+            _modal.on('hidden.bs.modal', function (event) {
+                _modal.find('#text-name').val('');
+                _modal.find('#text-description').val('');
+                _modal.find('#text-type').val('');
+                _modal.find('#text-score').val('');
+                _modal.find('#dynamic-score').prop('checked',false);
+                _modal.find('#dynamic-flag').prop('checked',false);
+                _modal.find('#text-flag').attr('disabled',false);
+                _modal.find('#text-attachment').val('');
+            });
+        }
+
+        function addNewChallengeSubmitListener(){
+
+            var _modal = $('#modal-new-challenge');
+            $('#new-challenge-submit').click(function(){
+
+                var competitionId = $('#title').attr('competition-id');
+
+                var challengeName = _modal.find('#text-name').val();
+                var challengeType = _modal.find('#text-type').val();
+                var challengeDesc = _modal.find('#text-description').val();
+                var challengeFlag = _modal.find('#text-flag').val();
+                var challengeScore = _modal.find('#text-score').val();
+                var challengeDockerurl = _modal.find('#text-dockerurl').val();
+
+                challengeScore = parseInt(challengeScore)
+
+                var challengeAttachment = _modal.find('#text-attachment').val();
+                challengeAttachment = challengeAttachment.split('\n');
+                challengeAttachment = challengeAttachment[0]===''?[]:challengeAttachment
+
+                var dynamicFlag = _modal.find('#dynamic-flag');
+                if(dynamicFlag.is(':checked')) challengeFlag = '';
+
+                var dynamicScore = _modal.find('#dynamic-score').is(':checked');
+
+                var data = {"name":challengeName,
+                            "desc":challengeDesc,
+                            "type":challengeType,
+                            "attachmenturls":challengeAttachment,
+                            "flag":challengeFlag,
+                            "score":challengeScore,
+                            "dynamicscore":true,
+                            "dockerurl":challengeDockerurl};
+                
+
+                var action = $(this).text();
+                if(action.match('Edit')){
+                    data.uuid = $(this).attr('challenge-id');
+                }
+
+                $.ajax({
+                    url: route.addChallenge.replace('{uuid}',competitionId),
+                    method: 'POST',
+                    dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type':'application/json'
+                    },
+                    data:JSON.stringify(data),
+                    success: function(res) {
+                        functions.hideLoadingSpinner();
+                        functions.showMessage(`${action} challenge success`,'green');
+
+                    },
+                    error: function(data) {
+                        functions.showMessage(data.responseJSON.msg,'red');
+                        functions.hideLoadingSpinner();
+                    }
+                });
+
+            });
+
+        }
+
+
+
+        $(document).ready(function() {
+            var adminLoggined = localStorage.getItem('adminLoggined');
+            if (adminLoggined !== 'true') {
+                // window.location.href = 'login.html'
+            }
+
+            showAllCompetitions();
+            addNewListener();
+            addDynamicListener();
+            addNewChallengeSubmitListener();
+            addModalHideListener();
+        });
+
+    </script>
+
+    <!-- Include your custom JavaScript file -->
+    <!-- <script src="../js/script.js" type="module"></script> -->
+
+</body>
+</html>
