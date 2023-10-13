@@ -231,35 +231,46 @@ export function addNavExitListener(){
     });
 }
 
-function addRegisterSubmitListener(){
-    $("#register-form #submit").click(function(){
+export function recaptcha_register_submit(token){
+    //console.log(token)
 
-        var username = $('#register-form #username').val();
-        var password = $('#register-form #password').val();
-        var stuCode = $('#register-form #stuCode').val();
-        
-        if(!username || !password){
-            functions.showMessage('Neither username nor password can be empty.','red');
-        }else{
-            $.ajax({
-                url: route.register,
-                method: 'POST',
-                dataType: 'json',
-                data:JSON.stringify({"username":username,"password":password,"stuCode":stuCode}),
-                success: function(data) {
-                    if(data.code === 0){
-                        functions.showMessage('Register Success!','green');
-                        setTimeout(function(){
-                            $('.nav-link[href="#Login"]').click();
-                        },1500);
-                    }
-                },
-                error: function(data) {
-                    functions.showMessage(data.responseJSON.msg,'red');
+    var username = $('#register-form #username').val();
+    var password = $('#register-form #password').val();
+    var stuCode = $('#register-form #stuCode').val();
+    
+    if(!username || !password){
+        functions.showMessage('Neither username nor password can be empty.','red');
+    }else{
+        $.ajax({
+            url: route.register,
+            method: 'POST',
+            dataType: 'json',
+            data:JSON.stringify({
+                "username": username,
+                "password": password,
+                "stuCode": stuCode,
+                "token": token
+            }),
+            success: function(data) {
+                if(data.code === 0){
+                    functions.showMessage('Register Success!','green');
+                    setTimeout(function(){
+                        $('.nav-link[href="#Login"]').click();
+                    },1500);
                 }
-            });
-        }
+            },
+            error: function(data) {
+                functions.showMessage(data.responseJSON.msg,'red');
+            }
+        });
+    }
 
+}
+
+function addRegisterSubmitListener(){
+    //$("#register-form #submit").attr("data-callback", recaptcha_register_submit)
+    $("#register-form #submit").click(()=>{
+        grecaptcha.execute();
     });
 }
 
