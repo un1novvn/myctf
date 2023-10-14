@@ -2,6 +2,7 @@
 
 import * as listener from './listener.js';
 
+window.listener = listener
 $(document).ready(function() {
 
     var isLoggedIn = localStorage.getItem('isLoggedIn');

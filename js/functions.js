@@ -12,6 +12,30 @@ export function milliseconds2time(milliseconds){
     return `${hour}:${minute}:${second}`;
 }
 
+export function get(url,token){
+    var headers = {'Content-Type':'application/json'}
+
+    var ret;
+
+    if(token){
+        headers.Authorization = 'Bearer ' + token;
+    }
+    $.ajax({
+        url: url,
+        method: 'GET',
+        dataType: 'json',
+        headers: headers,
+        async:false,
+        success: function(res) {
+            ret = res
+        },
+        error: function(data) {
+            functions.showMessage(data.responseJSON.msg,'red');
+        }
+    });
+    return ret
+}
+
 export function formatDate(milliseconds) {
     const date = new Date(milliseconds);
 
