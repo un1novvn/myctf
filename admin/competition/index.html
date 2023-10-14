@@ -129,16 +129,37 @@
     
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" id="new-challenge-desc">Description</span>
+                            <span class="input-group-text" id="new-competition-desc">Description</span>
                         </div>
-                        <input type="text" class="form-control" aria-label="new-challenge-type" aria-describedby="new-challenge-type" id="text-type" required>
+                        <input type="text" class="form-control" aria-label="new-challenge-type" aria-describedby="new-challenge-type" id="text-description" required>
                     </div>
-    
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="new-competition-password">Password</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="new-competition-password" aria-describedby="new-challenge-type" id="text-password" required>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="new-competition-start">Start</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="new-competition-start" aria-describedby="new-challenge-type" id="text-start" placeholder="yyyy-mm-dd hh:mm:ss">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="new-competition-end">End</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="new-competition-end" aria-describedby="new-challenge-type" id="text-end" placeholder="yyyy-mm-dd hh:mm:ss">
+                    </div>
+
                 </div>
     
     
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="new-challenge-submit">New</button>
+                    <button type="button" class="btn btn-primary" id="new-competition-submit">New</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
     
@@ -210,6 +231,17 @@
         </div>
     </div>
 
+    <div class="row justify-content-center" style="margin-top: 2%;">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination" id="page-navigation" now-page="1">
+              <li class="page-item"><a class="page-link" href="#" action="one">1</a></li>
+              <li class="page-item"><a class="page-link" href="#" action="previous">&#60;&#60;</a></li>
+              <li class="page-item"><a class="page-link" href="#" action="next">&#62;&#62;</a></li>
+              <input type="text" size="1" maxlength="3" style="text-align: center; border: 1px solid #dee2e6;color: #007bff;" id="now-page" value="1">
+            </ul>
+        </nav>
+    </div>
+
 
     <!-- Include Bootstrap and jQuery JavaScript -->
     <script src="../../js/jquery-3.7.1.min.js"></script>
@@ -223,12 +255,16 @@
         //     window.location.href = '../login.html'
         // }
 
+        var adminLoggined = localStorage.getItem('adminLoggined');
+        if (adminLoggined !== 'true') {
+            window.location.href = '../login.html'
+        }
         import * as functions from "../../js/functions.js";
         import {route} from "../../js/route.js";
         import * as listener from "../listener.js";
         var competitionListItem;
         var challengeListItem;
-        var token = localStorage.getItem("token");
+        var token = localStorage.getItem("adminToken");
 
         $.get('challenge-list-item.html', function(data) {
             challengeListItem = data;
@@ -237,56 +273,114 @@
         $.get('competition-list-item.html', function(data) {
             competitionListItem = data;
         });
-        function showAllCompetitions(){
+
+
+        function initPageNavigation(){
+
+            function getCompetitionsByPage(page){ // 返回一个 _container
+                var res = functions.get(route.getCompetitions+`?page=${page}`,token)
+                var competitions = res.data;
+                var _container = $('<div class="container"><ul class="list-group list-group-flush" id="competition-ul"></ul></div>')
+                var _competitionUl = _container.find('#competition-ul');
+                competitions.forEach(function(competition){
+
+                    var _competition = $(competitionListItem);
+                    var _competitionName = _competition.find('#competition-name');
+                    var _startEnd = _competition.find('#competition-start-end');
+
+                    var _options = _competition.find('.option');
+
+                    _competitionName.text(competition.name);
+                    _startEnd.html(`<span class="badge badge-success">start</span>${functions.formatDate(competition.start)} <span class="badge badge-danger">end</span>${functions.formatDate(competition.end)}`);
+
+                    _options.attr('competition-id',competition.uuid);
+                    _competition.appendTo(_competitionUl)
+                });
+                return _container;
+            }
+
+            
+            var _navigation = $('#page-navigation');
+            var _nowPage = _navigation.find('#now-page');
+
+            _nowPage.blur(function(){ // 输入框失去焦点后自动发请求获取分页
+                var page = parseInt($(this).val()-1);
+                var _content = $('#content');
+                functions.showLoadingSpinner()
+                _content.fadeOut('fast', function() {
+                    _content.empty();
+                    var _container = getCompetitionsByPage(page)
+                    _container.appendTo(_content);
+                    functions.hideLoadingSpinner();
+                    addChallengesListener();
+                    addEditCompetitionListener();
+                    _content.fadeIn('fast');
+                });
+            });
+
+            _navigation.find('.page-link').click(function(){
+
+                var action = $(this).attr('action');
+                var nowPage = parseInt(_nowPage.val()); 
+
+                if(action.match('previous')){
+                    _nowPage.val(nowPage-1>=1?nowPage-1:1)
+                }else if (action.match('next')){
+                    _nowPage.val(nowPage+1)
+                }else{
+                    _nowPage.val(1)
+                }
+                
+                var page = parseInt(_nowPage.val()-1);
                 var _content = $('#content');
 
                 functions.showLoadingSpinner()
                 _content.fadeOut('fast', function() {
-
                     _content.empty();
-
-                    $.ajax({
-                        url: route.getCompetitions,
-                        method: 'GET',
-                        dataType: 'json',
-                        headers: {
-                            'Authorization': 'Bearer ' + token,
-                            'Content-Type':'application/json'
-                        },
-                        success: function(res) {
-                            var competitions = res.data;
-
-                            var _container = $('<div class="container"><ul class="list-group list-group-flush" id="competition-ul"></ul></div>')
-                            var _competitionUl = _container.find('#competition-ul');
-                            competitions.forEach(function(competition){
-
-                                var _competition = $(competitionListItem);
-
-                                var _competitionName = _competition.find('#competition-name');
-                                var _startEnd = _competition.find('#competition-start-end');
-
-                                var _options = _competition.find('.col-1');
-
-                                _competitionName.text(competition.name);
-                                _startEnd.html(`<span class="badge badge-success">start</span>${functions.formatDate(competition.start)} <span class="badge badge-danger">end</span>${functions.formatDate(competition.end)}`);
-
-                                _options.attr('competition-id',competition.uuid);
-
-                                _competition.appendTo(_competitionUl)
-
-                            });
-                            _container.appendTo(_content);
-                            functions.hideLoadingSpinner();
-                            addChallengesListener();
-                        },
-                        error: function(data) {
-                            functions.showMessage(data.responseJSON.msg,'red');
-                        }
-                    });
-
+                    var _container = getCompetitionsByPage(page)
+                    _container.appendTo(_content);
+                    functions.hideLoadingSpinner();
+                    addChallengesListener();
+                    addEditCompetitionListener();
                     _content.fadeIn('fast');
                 });
+            });
 
+            //手动触发，进入页面默认显示第一分页
+            _nowPage.blur();
+
+        }
+        
+
+        function showAllCompetitions(){
+
+
+        }
+
+        function addEditCompetitionListener(){
+            var competitionId = $('#title').attr("competition-id");
+
+            $('.edit').click(function(){
+                
+                var competitionId = $(this).attr('competition-id');
+                var _modal = $('#modal-new-competition');
+
+                var res = functions.get(route.getCompetitionInfo.replace('{uuid}',competitionId),token);
+                var competition = res.data[0];
+                _modal.find('#text-name').val(competition.name);
+                _modal.find('#text-description').val(competition.desc);
+                _modal.find('#text-password').val(competition.password);
+                _modal.find('#text-start').val(functions.formatDate(competition.start));
+                _modal.find('#text-end').val(functions.formatDate(competition.end));
+
+                _modal.find('.modal-title').text('Edit Challenge');
+                _modal.find('#new-competition-submit').text('Edit');
+                _modal.find('#new-competition-submit').attr('competition-id',competitionId);
+                _modal.modal('show')
+
+                functions.hideLoadingSpinner();
+
+            });
         }
 
         function addEditChallengeListener(){
@@ -295,46 +389,29 @@
             $('.edit').click(function(){
                 var challengeId = $(this).attr('challenge-id');
                 var _modal = $('#modal-new-challenge');
+                var res = functions.get(route.getOneChallenge.replace('{cuuid}',competitionId).replace('{uuid}',challengeId),token);
+                var challenge = res.data[0];
+                _modal.find('#text-name').val(challenge.name);
+                _modal.find('#text-description').val(challenge.desc);
+                _modal.find('#text-type').val(challenge.type);
+                _modal.find('#text-score').val(challenge.score);
+                _modal.find('#text-dockerurl').val(challenge.dockerurl);
+                _modal.find('#dynamic-score').prop('checked',challenge.dynamicscore);
+                _modal.find('#text-flag').val(challenge.flag?challenge.flag:'');
+                _modal.find('#dynamic-flag').prop('checked',challenge.hasContainer);
+                _modal.find('#text-flag').attr('disabled',challenge.hasContainer);
 
-                $.ajax({//获取赛题信息
-                    url: route.getOneChallenge.replace('{cuuid}',competitionId).replace('{uuid}',challengeId),
-                    method: 'GET',
-                    dataType: 'json',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type':'application/json'
-                    },
-                    success: function(res) {
-
-                        var challenge = res.data[0];
-                        _modal.find('#text-name').val(challenge.name);
-                        _modal.find('#text-description').val(challenge.desc);
-                        _modal.find('#text-type').val(challenge.type);
-                        _modal.find('#text-score').val(challenge.score);
-                        _modal.find('#text-dockerurl').val(challenge.dockerurl);
-                        _modal.find('#dynamic-score').prop('checked',challenge.dynamicscore);
-                        _modal.find('#text-flag').val(challenge.flag?challenge.flag:'');
-                        _modal.find('#dynamic-flag').prop('checked',challenge.hasContainer);
-                        _modal.find('#text-flag').attr('disabled',challenge.hasContainer);
-
-                        var attachments = ''
-                        challenge.attachmenturls.forEach(function(url){
-                            attachments += url+'\n'
-                        });
-                        _modal.find('#text-attachment').val(attachments);
-                        _modal.find('.modal-title').text('Edit Challenge');
-                        _modal.find('#new-challenge-submit').text('Edit');
-                        _modal.find('#new-challenge-submit').attr('challenge-id',challengeId);
-                        _modal.modal('show')
-
-                        functions.hideLoadingSpinner();
-                    },
-                    error: function(data) {
-                        functions.showMessage(data.responseJSON.msg,'red');
-                        functions.hideLoadingSpinner();
-                    }
+                var attachments = ''
+                challenge.attachmenturls.forEach(function(url){
+                    attachments += url+'\n'
                 });
+                _modal.find('#text-attachment').val(attachments);
+                _modal.find('.modal-title').text('Edit Challenge');
+                _modal.find('#new-challenge-submit').text('Edit');
+                _modal.find('#new-challenge-submit').attr('challenge-id',challengeId);
+                _modal.modal('show')
 
+                functions.hideLoadingSpinner();
 
             });
 
@@ -357,44 +434,32 @@
 
                     _content.empty();
 
-                    $.ajax({
-                        url: route.getChallenges.replace('{uuid}',competitionId),
-                        method: 'GET',
-                        dataType: 'json',
-                        headers: {
-                            'Authorization': 'Bearer ' + token,
-                            'Content-Type':'application/json'
-                        },
-                        success: function(res) {
-                            var challenges = res.data;
+                    var res = functions.get(route.getChallenges.replace('{uuid}',competitionId),token)
 
-                            var _container = $('<div class="container"><ul class="list-group list-group-flush" id="challenge-ul"></ul></div>')
-                            var _challengeUl = _container.find('#challenge-ul');
-                            challenges.forEach(function(challenge){
+                    var challenges = res.data;
 
-                                var _challenge = $(challengeListItem);
-                                var _challengeType = _challenge.find('#challenge-type');
-                                var _challengeName = _challenge.find('#challenge-name');
-                                var _options = _challenge.find('.col-1');
+                    var _container = $('<div class="container"><ul class="list-group list-group-flush" id="challenge-ul"></ul></div>')
+                    var _challengeUl = _container.find('#challenge-ul');
+                    challenges.forEach(function(challenge){
 
-                                _challengeType.html(`<span class="badge badge-primary">${challenge.type}</span>`);
-                                _challengeName.text(challenge.name);
-                                _options.attr('challenge-id',challenge.uuid);
-                                _challenge.appendTo(_challengeUl)
+                        var _challenge = $(challengeListItem);
+                        var _challengeType = _challenge.find('#challenge-type');
+                        var _challengeName = _challenge.find('#challenge-name');
+                        var _options = _challenge.find('.col-1');
 
-                            });
-                            _container.appendTo(_content);
+                        _challengeType.html(`<span class="badge badge-primary">${challenge.type}</span>`);
+                        _challengeName.text(challenge.name);
+                        _options.attr('challenge-id',challenge.uuid);
+                        _challenge.appendTo(_challengeUl)
 
-                            //添加edit按钮监听
-                            addEditChallengeListener();
-                            functions.hideLoadingSpinner();
-                        },
-                        error: function(data) {
-                            functions.showMessage(data.responseJSON.msg,'red');
-                            functions.hideLoadingSpinner();
-                        }
                     });
+                    _container.appendTo(_content);
 
+                    //添加edit按钮监听
+                    addEditChallengeListener();
+                    functions.hideLoadingSpinner();
+
+                    $('#page-navigation').css('display','none');
                     _content.fadeIn('fast');
                 });
             });
@@ -412,10 +477,10 @@
                     _modal.find('#new-challenge-submit').text('New');
                     _modal.modal('show');
                 }else{//新建competition
-
-
-
-
+                    var _modal = $("#modal-new-competition");
+                    _modal.find('.modal-title').text('New Competition');
+                    _modal.find('#new-challenge-submit').text('New');
+                    _modal.modal('show');
                 }
 
             });
@@ -434,16 +499,14 @@
 
         //模态框关闭时清空内容
         function addModalHideListener(){
-            var _modal = $('#modal-new-challenge')
+            var _modal = $('.modal')
             _modal.on('hidden.bs.modal', function (event) {
-                _modal.find('#text-name').val('');
-                _modal.find('#text-description').val('');
-                _modal.find('#text-type').val('');
-                _modal.find('#text-score').val('');
-                _modal.find('#dynamic-score').prop('checked',false);
-                _modal.find('#dynamic-flag').prop('checked',false);
-                _modal.find('#text-flag').attr('disabled',false);
-                _modal.find('#text-attachment').val('');
+                var _input = _modal.find('input')
+                _input.val('');
+                _input.prop('checked',false);
+                _input.prop('checked',false);
+                _input.attr('disabled',false);
+                _modal.find('textarea').val('')
             });
         }
 
@@ -511,18 +574,74 @@
 
         }
 
+        function addNewCompetitionSubmitListener(){
 
+            var _modal = $('#modal-new-competition');
+            $('#new-competition-submit').click(function(){
+
+                var name = _modal.find('#text-name').val();
+                var description = _modal.find('#text-description').val();
+                var password = _modal.find('#text-password').val();
+                var start = _modal.find('#text-start').val();
+                var end = _modal.find('#text-end').val();
+
+                start = Date.parse(start);
+                end = Date.parse(end);
+
+                if(end< start || Object.is(start,NaN) || Object.is(end,NaN)){
+                    functions.showMessage('Date format invalid!','red')
+                }else{
+
+                var data = {"name":name,
+                        "desc":description,
+                        "password":password,
+                        "start":start,
+                        "end":end,
+                        "pause":false};
+                var action = $(this).text();
+                if(action.match('Edit')){
+                    data.uuid = $(this).attr('competition-id');
+                }
+
+                $.ajax({
+                    url: route.newCompetition,
+                    method: 'POST',
+                    dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type':'application/json'
+                    },
+                    data:JSON.stringify(data),
+                    success: function(res) {
+                        functions.hideLoadingSpinner();
+                        functions.showMessage(`${action} competition success`,'green');
+
+                    },
+                    error: function(data) {
+                        functions.showMessage(data.responseJSON.msg,'red');
+                        functions.hideLoadingSpinner();
+                    }
+                });
+
+
+                }
+
+
+            });
+
+        }
 
         $(document).ready(function() {
             var adminLoggined = localStorage.getItem('adminLoggined');
             if (adminLoggined !== 'true') {
                 // window.location.href = 'login.html'
             }
-
+            initPageNavigation();
             showAllCompetitions();
             addNewListener();
             addDynamicListener();
             addNewChallengeSubmitListener();
+            addNewCompetitionSubmitListener();
             addModalHideListener();
         });
 

@@ -2,7 +2,7 @@
 
 export var route = 
 {
-    "getCompetitions":"https://competition-ctf-uzvdtuvxfj.cn-hongkong.fcapp.run/competitions",
+    "getCompetitions":"https://competition-ctf-uzvdtuvxfj.cn-hongkong.fcapp.run/competitions", //getCompetitions+'?page=0'
 
     "login":"https://auth-ctf-guopkzqcxo.cn-hongkong.fcapp.run/login",
 
@@ -23,6 +23,8 @@ export var route =
     "addChallenge":"https://competition-ctf-uzvdtuvxfj.cn-hongkong.fcapp.run/competitions/{uuid}/problems",
 
     "newChallenge":"https://competition-ctf-uzvdtuvxfj.cn-hongkong.fcapp.run/competitions/{uuid}/problems",
+
+    "newCompetition":"https://competition-ctf-uzvdtuvxfj.cn-hongkong.fcapp.run/competitions",
 
     "submitFlag":"https://competition-ctf-uzvdtuvxfj.cn-hongkong.fcapp.run/competitions/{cuuid}/problems/{puuid}/submit"
 

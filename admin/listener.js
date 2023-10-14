@@ -2,7 +2,6 @@
 import * as functions from '../js/functions.js'
 import { route } from '../js/route.js';
 
-var token = localStorage.getItem("token");
 
 export function addAdminLoginListener(){
     $("#admin-login-form #submit").click(function(){
@@ -18,7 +17,7 @@ export function addAdminLoginListener(){
 
                 if(data.code === 0 && data.data.priv == 1){
                     //登录成功
-                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('adminToken', data.data.token);
                     localStorage.setItem('adminLoggined', true);
 
                     functions.showMessage('Login Success!','green');

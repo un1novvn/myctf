@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "bootstrap-icons": "^1.11.1",
-    "mongodb": "^6.1.0"
+    "mongodb": "^6.1.0",
+    "redis": "^4.6.10"
   }
 }

@@ -277,7 +277,7 @@ function addLoginSubmitListener(){
                 dataType: 'json',
                 data:JSON.stringify({"username":username,"password":password}),
                 success: function(data) {
-                    //有没有code不是0但是也不走下面的error的情况？
+                    
                     if(data.code === 0){
                         //登录成功
                         localStorage.setItem('token', data.data.token);
