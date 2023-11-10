@@ -8,14 +8,21 @@ var competitionMainPage;
 var challengeCategory;
 var userProfilePage;
 var resetPasswordPage;
-
+var scoreboardPage
 var intervalHandler = 0;
+
+var intervalHandler2 = 0
 
 var isLoggedIn = localStorage.getItem("isLoggedIn");
 var token = localStorage.getItem('token');
 
 $.get('html/user-profile-page.html', function(data) {
     userProfilePage = data;
+});
+
+
+$.get('html/competition-scoreboard.html', function(data) {
+    scoreboardPage = data;
 });
 
 $.get('html/reset-password-page.html', function(data) {
@@ -34,11 +41,11 @@ $.get('html/competition-signup.html', function(data) {
     competitionSignContent = data;
 });
 
-$.get('html/login-form.html', function(data) {
+$.get('html/login-page.html', function(data) {
     loginFormContent = data;
 });
 
-$.get('html/register-form.html', function(data) {
+$.get('html/register-page.html', function(data) {
     registerFormContent = data;
 });
 
@@ -48,10 +55,13 @@ $.get('html/competition-main-page.html', function(data) {
 
 
 export function addNavHomeListener(){
-    $('.nav-link[href="#Home"]').click(function() {
+    $('a[href="#Home"]').click(function() {
         // Fade out the current content
         $('#content').fadeOut('fast', function() {
-            $('#content').html('<h2>Hello, World!</h2>');
+
+            var home = functions.get(route.info).data.home
+
+            $('#content').html(`<h2>${home}</h2>`);
             $('#content').fadeIn('fast');
         });
 
@@ -151,6 +161,7 @@ export function addNavRegisterListener(){
     });
 }
 
+// TODO
 function addProfileUpdateListener(){
     $('#submit').click(function(){
 
@@ -163,13 +174,12 @@ function addPasswordUpdateListener(){
 
         var _content = $('#content')
         _content.fadeOut('fast', function() {
-
             var _resetPassword = $(resetPasswordPage);
-
             $('#content').html(_resetPassword);
 
             $('#submit').click(function(){
 
+                functions.showLoadingSpinner()
                 var oldpass = $('#oldpass').val();
                 var newpass1 = $('#newpass1').val();
 
@@ -179,11 +189,16 @@ function addPasswordUpdateListener(){
                 }else if(!newpass1 || !newpass2){
                     functions.showMessage('The password can not be empty','red')
                 }else{
-                    functions.showMessage('Reset Success!','green');
-                    //发请求改密码
+                    var res = functions.post(route.changepass,{'password':newpass1},token)
+                    if(res){
+                        functions.showMessage('Reset password success! Please login again.','green')
+                        setTimeout(function(){
+                            location.reload()
+                        },1500);
+                    }
                 }
+                functions.hideLoadingSpinner()
             });
-
 
             _content.fadeIn('fast')
         });
@@ -199,14 +214,14 @@ export function addNavProfileListener(){
         var _content = $('#content')
         _content.fadeOut('fast', function() {
 
-            var _userProfile = $(userProfilePage);
-            var userid = '0000000000000';
-            //根据userid 查询用户信息
-
-            var user = {'username':'zhongdejie'}
-            _userProfile.find('#user-profile-page #username').attr('value',user.username);
-
-            $('#content').html(_userProfile);
+            var res = functions.get(route.profile,token)
+            if(res){
+                var _userProfile = $(userProfilePage)
+                var username = res.data[0].username
+                var stuid = res.data.stuid
+                _userProfile.find('#username').attr('value',username);
+                $('#content').html(_userProfile);
+            }
             addProfileUpdateListener();
             addPasswordUpdateListener();
             _content.fadeIn('fast')
@@ -271,6 +286,7 @@ function addRegisterSubmitListener(){
     //$("#register-form #submit").attr("data-callback", recaptcha_register_submit)
     $("#register-form #submit").click(()=>{
         grecaptcha.execute();
+        
     });
 }
 
@@ -282,13 +298,14 @@ function addLoginSubmitListener(){
         if(!username || !password){
             functions.showMessage('Neither username nor password can be empty.','red');
         }else{
+            functions.showLoadingSpinner()
             $.ajax({
                 url: route.login,
                 method: 'POST',
                 dataType: 'json',
                 data:JSON.stringify({"username":username,"password":password}),
                 success: function(data) {
-                    
+                    functions.hideLoadingSpinner()
                     if(data.code === 0){
                         //登录成功
                         localStorage.setItem('token', data.data.token);
@@ -300,8 +317,10 @@ function addLoginSubmitListener(){
                         },1500);
     
                     }
+                    
                 },
                 error: function(data) {
+                    functions.hideLoadingSpinner()
                     functions.showMessage(data.responseJSON.msg,'red');
                 }
             });
@@ -314,25 +333,15 @@ function addCompetitionSignupSubmitListener(uuid){
     $('#competition-sign #submit').click(function(){
         var username = $('#competition-sign #username').val();
         var stuCode = $('#competition-sign #stuCode').val();
+        var competitionPasswd = $('#competition-sign #competition-password').val();
         var token = localStorage.getItem('token');
-        $.ajax({
-            url: route.signupCompetition.replace('{uuid}',uuid),
-            method: 'POST',
-            dataType: 'json',
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type':'application/json'
-            },
-            data:JSON.stringify({"username":username,"stuCode":stuCode.toString(),"password":""}),
-            success: function(data) {
-                if(data.code === 0){
-                    functions.showMessage('Sign up success!','green');
-                }
-            },
-            error: function(data) {
-                functions.showMessage(data.responseJSON.msg,'red');
-            }
-        });
+        var res = functions.post(route.signupCompetition.replace('{uuid}',uuid),{"username":username,"stuCode":stuCode.toString(),"password":competitionPasswd},token)
+        if(res && res.code === 0){
+            functions.showMessage('Sign up success!','green');
+            setTimeout(function(){
+                location.reload()
+            },1500);
+        }
 
     });
 }
@@ -447,8 +456,15 @@ function addChallengeListener(){
         var challengeId = _challenge.attr('challenge-id');
         var competitionId = $('.competition-name').attr('competition-id')
         var challengeName = _challenge.attr('challenge-name');
+        var solved = _challenge.attr('solved');
+        if(solved === 'true'){
+            challengeName += ' (Solved)'
+        }
         var hasContainer = _challenge.attr('challenge-has-container');
         var attachments = _challenge.attr('challenge-attachment');
+
+        var nowscore = _challenge.find('#nowscore').text()
+        var solvedTimes = _challenge.find('#solved-times').text()
 
         attachments = attachments.split(',');
 
@@ -464,7 +480,10 @@ function addChallengeListener(){
 
         clearInterval(intervalHandler);
 
-        _modal.find('#competition-name').html(`<h5>${challengeName}</h5>`);
+        _modal.find('#competition-name').html(`<h4>${challengeName}</h4>`);
+        _modal.find('#nowscore').text(nowscore);
+        _modal.find('#solved-times').text(solvedTimes);
+
 
         _modal.find('#competition-desc').text(desc);
 
@@ -536,29 +555,6 @@ function addChallengeListener(){
 
     });
 }
-/*
-
-(不用)
-
-用于销毁定时触发器。
-点击题目，弹出框，关闭框，重复这个过程，产生的定时器不会销毁，所以要专门加个监听
-*/
-function addIntervalDealer(){
-    
-    // var a = $('#challenge-modal')[0]
-
-    // //options：监听的属性
-    // var options = { attributes: true};
-
-    // //回调事件
-    // function callback(mutationsList, observer) {
-
-    //     console.log(intervalHandlers);
-
-    // }
-    // var mutationObserver = new MutationObserver(callback);
-    // mutationObserver.observe(a, options);
-}
 
 
 function addFlagSubmitListener(){
@@ -570,29 +566,167 @@ function addFlagSubmitListener(){
         var flag = _modal.find('#flag').val()
 
         if(flag !== ''){
-            $.ajax({
-                url: route.submitFlag.replace('{cuuid}',competitionId).replace('{puuid}',challengeId),
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + token,
-                },
-                dataType: 'json',
-                data:JSON.stringify({"flag":flag}),
-                success: function(res) {
-                    functions.showMessage('flag correct!','green');
-                },
-                error: function(data) {
-                    functions.showMessage(data.responseJSON.msg,'red');
-                }
-            });
 
+            var res = functions.post(route.submitFlag.replace('{cuuid}',competitionId).replace('{puuid}',challengeId),{"flag":flag},token)
+            if(res){
+                functions.showMessage('flag correct!','green');
+                $(`.challenge[challenge-id="${challengeId}"]`).attr('class','challenge solved-challenge')
 
+                setTimeout(function(){
+                    $('.competition-play[uuid=""]')
+                },1500)
+
+            }
         }else{
             functions.showMessage('flag can not be empty','red')
         }
 
     });
 
+}
+
+function addNavChallengesListener(){
+    var _challengePart = $('.challenge-part');
+    var uuid = $('.competition-name').attr('competition-id')
+
+    $('a[href="#Challenges"]').click(function(){
+        _challengePart.fadeOut('fast',function(){
+            _challengePart.empty()
+            showChallenges(uuid,_challengePart)
+            _challengePart.fadeIn('fast')
+        })
+        
+    })
+}
+
+function addNavScoreboardListener(){
+    var _challengePart = $('.challenge-part');
+    $('a[href="#Scoreboard"]').click(function(){
+        var uuid = $('.competition-name').attr('competition-id')
+        _challengePart.fadeOut('fast',function(){
+            _challengePart.empty()
+            var _scoreboard = $(scoreboardPage)
+            var _types = _scoreboard.find('#challenge-types')
+            var _names = _scoreboard.find('#challenge-names')
+            var body = _scoreboard.find('#scoreboard-body')
+
+            
+            var res = functions.get(route.getChallenges.replace('{uuid}',uuid),token)
+            var res2 = functions.get(route.scoreboard.replace('{cuuid}',uuid),token)
+            var rank = []
+            if(res2){
+                rank = res2.data
+            }
+            var challenges = []
+            if(res){
+                challenges = res.data
+            }
+            
+            var categories = {}
+            for(var challenge of challenges){
+                if(categories[challenge.type] === undefined){
+                    categories[challenge.type] = [] 
+                }
+                categories[challenge.type].push(challenge);
+                
+            }
+            var challengeIds = []
+            
+        
+            for(var category in categories){
+                var challenges = categories[category]
+                $(`<th scope="col" colspan="${challenges.length}">${category}</th>`).appendTo(_types)
+                for(var challenge of challenges){
+                    $(`<td>${challenge.name}</td>`).appendTo(_names)
+                    challengeIds.push(challenge.uuid)
+                }
+        
+            }
+            
+            for(var i in rank){
+        
+                var username = rank[i].username
+                var rnk = parseInt(i)+1
+                var score = rank[i].score
+                var item = $(`<tr><th scope="row">${functions.htmlEncode(username)}</th><td>${rnk}</td><td>${score}</td></tr>`)
+        
+                for(var challengeId of challengeIds){
+                    if(functions.inArray(challengeId,rank[i].solvedProblems)){
+                        if(functions.inArray(challengeId,rank[i].firstblood)){
+                            $('<td><img src="img/droplet-fill.svg" alt="Bootstrap" width="30px" height="30px"></td>').appendTo(item)
+                        }else if(functions.inArray(challengeId,rank[i].secondblood)){
+                            $('<td><img src="img/droplet-half.svg" alt="Bootstrap" width="30px" height="30px"></td>').appendTo(item)
+                        }else if(functions.inArray(challengeId,rank[i].thirdblood)){
+                            $('<td><img src="img/droplet.svg" alt="Bootstrap" width="30px" height="30px"></td>').appendTo(item)
+                        }else{
+                            $('<td><img src="img/bookmark-check.svg" alt="Bootstrap" width="30px" height="30px"></td>').appendTo(item)
+                        }
+                    }else{
+                        $('<td></td>').appendTo(item)
+                    }
+                }
+        
+                item.appendTo(body)
+            }
+
+            _scoreboard.appendTo(_challengePart)
+            _challengePart.fadeIn('fast')
+        })
+    })
+    
+
+}
+
+function showChallenges(uuid,appendTo){
+    var res = functions.get(route.getChallenges.replace('{uuid}',uuid),token)
+    var solveds = functions.get(route.getSolveds.replace('{cuuid}',uuid),token).data
+    var nowscore = functions.get(route.nowscore.replace('{cuuid}',uuid),token).data
+    
+    if(res){
+        var challenges = res.data;
+        var categories = {}
+        challenges.forEach(function(challenge){
+            if(categories[challenge.type] === undefined){
+                categories[challenge.type] = [] 
+            }
+            categories[challenge.type].push(challenge);
+        });
+
+        for(var category in categories){
+            var _challengeCategory = $(challengeCategory);
+            var _challenges = _challengeCategory.find('.challenges')
+            _challengeCategory.find('.category').text(category)
+
+
+            for(var challenge of categories[category]){
+                var challengeClass = 'challenge'
+                var solved = 'false'
+                if(functions.inArray(challenge.uuid,solveds)){
+                    challengeClass = 'challenge solved-challenge'
+                    solved = 'true'
+                }
+
+                var _challenge = $(`<div class="${challengeClass}"\
+                challenge-name="${challenge.name}"\
+                challenge-id="${challenge.uuid}" \
+                challenge-desc="${challenge.desc}" \
+                challenge-attachment="${challenge.attachmenturls}" \
+                challenge-has-container="${challenge.hasContainer}" \
+                solved="${solved}">\
+                    <div class="container" style="display:flex;width:100%;height:100%">
+                        <div style="margin:auto auto">
+                            <div style="text-align:center;font-size:1.4rem;">${challenge.name}</div>
+                            <div id="nowscore" style="text-align:center;">${nowscore[challenge.uuid].nowscore} pts</div>
+                            <div id="solved-times" style="text-align:center;">${nowscore[challenge.uuid].solvedTimes} solved</div>
+                        </div>
+                    </div>
+                </div>`)
+                _challenge.appendTo(_challenges);
+                // 文字垂直水平居中
+            }
+            _challengeCategory.appendTo(appendTo)
+        }
+    }
 }
 
 function addCompetitionPlayListener(){
@@ -604,7 +738,6 @@ function addCompetitionPlayListener(){
 
         if(isLoggedIn){
             //检查是否报名了
-
             $.ajax({
                 url: route.getCompetitionInfo.replace('{uuid}',uuid),
                 method: 'GET',
@@ -613,80 +746,56 @@ function addCompetitionPlayListener(){
                     'Authorization': 'Bearer ' + token,
                 },
                 success: function(res) {
+                    clearInterval(intervalHandler2)
 
                     var _attended = res.data[0].attended;
+                    var endTime = res.data[0].end
                     if(_attended){
                         //展示比赛页面
                         _content.empty();
                         _content.fadeOut('fast',function(){
         
-                            //根据比赛UUID 查 赛题
-                            $.ajax({
-                                url: route.getChallenges.replace('{uuid}',uuid),
-                                method: 'GET',
-                                dataType: 'json',
-                                headers: {
-                                    'Authorization': 'Bearer ' + token,
-                                },
-                                success: function(res) {
-        
-                                    var challenges = res.data;
-                                    var categories = {}
-                                    challenges.forEach(function(challenge){
-                                        
-                                        if(categories[challenge.type] === undefined){
-                                            categories[challenge.type] = [] 
-                                        }
-                                        categories[challenge.type].push(challenge);
+                            var userdata = functions.get(route.userdata.replace('{cuuid}',uuid),token).data
+                            
+                            if(res){
 
-                                    });
+                                var _competitionMainPage = $(competitionMainPage);
+                                _competitionMainPage.find('.competition-name').text(competitionName);
+                                _competitionMainPage.find('#user-name').html(`<h5>Your name: ${functions.htmlEncode(userdata.username)}</h5>`)
+                                _competitionMainPage.find('#user-score').html(`<h5>Your score: ${userdata.score}</h5>`)
+                                _competitionMainPage.find('#user-rank').html(`<h5>Your rank: ${userdata.rank}</h5>`)
 
-                                    var _competitionMainPage = $(competitionMainPage);
-                                    _competitionMainPage.find('.competition-name').text(competitionName);
-                                    _competitionMainPage.find('.competition-name').attr('competition-id',uuid)
+                                var remainingTime = endTime-Date.now();
+                                console.log(endTime)
+                                console.log(functions.milliseconds2time(remainingTime))
+                                var _remainTime = _competitionMainPage.find('#remain-time')
+                                _remainTime.html(`<h5>The competition will end in ${functions.milliseconds2time(remainingTime)}</h5>`);
+                                intervalHandler2 = setInterval(function(endTime){
+                                    //距离过期剩的毫秒数
+                                    var remainingTime = endTime-Date.now();
+                                    _remainTime.html(`<h5>The competition will end in ${functions.milliseconds2time(remainingTime)}</h5>`);
+                                },1000,endTime);
 
-                                    for(var category in categories){
-                                        var _challengeCategory = $(challengeCategory);
-                                        var _challenges = _challengeCategory.find('.challenges')
-                                        _challengeCategory.find('.category').text(category)
-                
-                                        categories[category].forEach(function(challenge){
+                                _competitionMainPage.find('.competition-name').attr('competition-id',uuid)
 
-                                            $(`<div class="challenge"\
-                                            challenge-name="${challenge.name}"\
-                                            challenge-id="${challenge.uuid}" \
-                                            challenge-desc="${challenge.desc}" \
-                                            challenge-attachment="${challenge.attachmenturls}" \
-                                            challenge-has-container="${challenge.hasContainer}"><div class="container" style="display:flex;width:100%;height:100%"><div style="margin:auto auto">
-                                            ${challenge.name}</div></div></div>`).appendTo(_challenges);
-                                            // 文字垂直水平居中
-                                        
-                                        });
-                                        _challengeCategory.appendTo(_competitionMainPage.find('.challenge-part'))
-                                    }
-                
-                                    _competitionMainPage.appendTo(_content);
-                                    
-                                    //给赛题添加监听
-                                    addChallengeListener();
+                                showChallenges(uuid,_competitionMainPage.find('.challenge-part'))
+                                _competitionMainPage.appendTo(_content);
+                                
+                                addNavScoreboardListener()
 
-                                    //实例化按钮
-                                    addInstantiateListener();
+                                addNavChallengesListener()
+                                //给赛题添加监听
+                                addChallengeListener();
 
-                                    
-                                    addFlagSubmitListener();
+                                //实例化按钮
+                                addInstantiateListener();
 
-                                    //销毁按钮
-                                    addDestroyListener();
+                                addFlagSubmitListener();
+                                //销毁按钮
+                                addDestroyListener();
 
-                                    _content.fadeIn('fast');
-        
-                                },
-                                error: function(data) {
-                                    functions.showMessage(data.responseJSON.msg,'red');
-                                }
-                            });
-        
+                                _content.fadeIn('fast');
+                            }
 
                         });
                         window.location.href='#'
@@ -712,9 +821,6 @@ function addCompetitionPlayListener(){
         }
 
     });
-}
-
-function addCompetitionScoreboardListener(){
 }
 
 

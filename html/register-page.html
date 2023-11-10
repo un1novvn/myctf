@@ -1,0 +1,56 @@
+
+<div class="container">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h2>Register</h2>
+                    </div>
+                    <div class="card-body">
+                        <!-- Login Form -->
+                        <form id="register-form">
+                            <div class="form-group">
+                                <label for="username">Username:</label>
+                                <input type="text" id="username" name="username" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password:</label>
+                                <input type="password" id="password" name="password" class="form-control" required>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="password">stuCode:</label>
+                                <input type="text" id="stuCode" name="stuCode" class="form-control" required>
+                            </div>
+                            <script>
+                                function _listener_recaptcha_register_submit(token){
+                                    console.log("recaptcha token")
+                                    console.log(token)
+                                    try{
+                                        //console.log(window.listener)
+                                        window.listener.recaptcha_register_submit(token)
+                                    }catch(err){
+                                        console.log(err)
+                                    }
+                                }
+
+                            </script>
+                            <input type="button" id="submit" value="Register" class="btn btn-primary">
+    
+                            <!-- reCAPTCHA -->
+                            <script src="https://recaptcha.net/recaptcha/api.js" async defer></script>
+                            <div class="form-group">
+                                <div id="recaptcha" class="g-recaptcha"
+                                    data-sitekey="6LcTzFwoAAAAAH190Ryn8MqfbsPxfPKbqt9hzuIq"
+                                    data-callback="_listener_recaptcha_register_submit"
+                                    data-size="invisible"></div>
+                                
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

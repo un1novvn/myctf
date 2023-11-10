@@ -30,10 +30,43 @@ export function get(url,token){
             ret = res
         },
         error: function(data) {
-            functions.showMessage(data.responseJSON.msg,'red');
+            showMessage(data.responseJSON.msg,'red');
         }
     });
     return ret
+}
+
+// data: an object
+export function post(url,data,token){
+    var headers = {'Content-Type':'application/json'}
+    var ret;
+    if(token){
+        headers.Authorization = 'Bearer ' + token;
+    }
+    $.ajax({
+        url: url,
+        method: 'POST',
+        dataType: 'json',
+        headers: headers,
+        async:false,
+        data:JSON.stringify(data),
+        success: function(res) {
+            ret = res
+        },
+        error: function(data) {
+            showMessage(data.responseJSON.msg,'red');
+        }
+    });
+    return ret
+}
+
+export function inArray(element,arr){
+    for(var i = 0;i<arr.length;i++){
+        if(element === arr[i]){
+            return true
+        }
+    }
+    return false
 }
 
 export function formatDate(milliseconds) {
@@ -54,6 +87,18 @@ export function formatDate(milliseconds) {
 }
 export function showLoadingSpinner() {
     $('#loading-indicator').show();
+}
+
+export function htmlEncode(str){
+    var temp = "";
+    if(str.length == 0) return "";
+    temp = str.replace(/&/g,"&amp;");
+    temp = temp.replace(/</g,"&lt;");
+    temp = temp.replace(/>/g,"&gt;");
+    temp = temp.replace(/\s/g,"&nbsp;");
+    temp = temp.replace(/\'/g,"&#39;");
+    temp = temp.replace(/\"/g,"&quot;");
+    return temp;
 }
 
 // Hide the loading spinner when the request is completed

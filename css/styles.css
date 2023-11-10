@@ -1,4 +1,9 @@
 /* CSS for the loading indicator */
+body{
+    font-family: Microsoft Yahei;
+}
+
+
 .spinner {
     display: none; /* Initially hide the indicator */
     position: fixed;
@@ -41,16 +46,21 @@
     background-color: #f0f0f0; /* Box background color */
     border: 1px solid #ccc; /* Box border */
     padding: 10px; /* Box padding */
-    height: 100px;
-    width: 170px;
+    height: 150px;
+    width: 250px;
     margin-right: 10px;
     margin-bottom: 20px;
     border-radius: 10px;
     display: inline-block;
-
     /* 如果没有这个， flex的inline-block 同一行时有的会出现错位*/
     vertical-align: top;
 }
+
+
+.solved-challenge{
+    background-color: #7dfe9a;
+}
+
 .challenge:hover{
     box-shadow: 10px 10px 10px -4px rgba(0,0,0,.3);
     cursor: pointer;
