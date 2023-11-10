@@ -116,9 +116,7 @@ export function addNavCompetitionListener(){
                     });
                     functions.hideLoadingSpinner();
 
-
                     addCompetitionPlayListener();
-                    addCompetitionScoreboardListener();
 
                 },
                 error: function() {
