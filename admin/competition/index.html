@@ -398,8 +398,8 @@
                 _modal.find('#text-dockerurl').val(challenge.dockerurl);
                 _modal.find('#dynamic-score').prop('checked',challenge.dynamicscore);
                 _modal.find('#text-flag').val(challenge.flag?challenge.flag:'');
-                _modal.find('#dynamic-flag').prop('checked',challenge.hasContainer);
-                _modal.find('#text-flag').attr('disabled',challenge.hasContainer);
+                _modal.find('#dynamic-flag').prop('checked',challenge.flag =='');
+                _modal.find('#text-flag').attr('disabled',challenge.flag =='');
 
                 var attachments = ''
                 challenge.attachmenturls.forEach(function(url){
