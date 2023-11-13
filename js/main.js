@@ -51,5 +51,5 @@ $(document).ready(function() {
         $(this).addClass('active');
     });
 
-    $('.nav-link[href="#Home"]').click();
+    $('.nav-link[href="#Competitions"]').click();
 });
