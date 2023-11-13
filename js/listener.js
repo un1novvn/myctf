@@ -683,7 +683,7 @@ function showChallenges(uuid,appendTo){
     var challenges = functions.get(route.getSolveds.replace('{cuuid}',uuid),token).data
     var solveds = []
     for(var challenge of challenges){
-        if(challenge.solved == true){
+        if(challenge.solved){
             solveds.push(challenge.puuid)
         }
     }
