@@ -275,7 +275,7 @@ export function recaptcha_register_submit(token){
                 }
             },
             error: function(data) {
-                functions.showMessage('The username and password\'s length should > 8','red');
+                functions.showMessage(data.responseJSON.msg);
             }
         });
     }
