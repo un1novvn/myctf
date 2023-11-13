@@ -329,11 +329,13 @@ function addLoginSubmitListener(){
 }
 function addCompetitionSignupSubmitListener(uuid){
     $('#competition-sign #submit').click(function(){
-        var username = $('#competition-sign #username').val();
-        var stuCode = $('#competition-sign #stuCode').val();
+        // var username = $('#competition-sign #username').val();
+        // var stuCode = $('#competition-sign #stuCode').val();
+
+
         var competitionPasswd = $('#competition-sign #competition-password').val();
         var token = localStorage.getItem('token');
-        var res = functions.post(route.signupCompetition.replace('{uuid}',uuid),{"username":username,"stuCode":stuCode.toString(),"password":competitionPasswd},token)
+        var res = functions.post(route.signupCompetition.replace('{uuid}',uuid),{"password":competitionPasswd},token)
         if(res && res.code === 0){
             functions.showMessage('Sign up success!','green');
             setTimeout(function(){
