@@ -190,6 +190,8 @@ function addPasswordUpdateListener(){
                     var res = functions.post(route.changepass,{'password':newpass1},token)
                     if(res){
                         functions.showMessage('Reset password success! Please login again.','green')
+                        localStorage.removeItem("isLoggedIn");
+                        localStorage.removeItem("token");
                         setTimeout(function(){
                             location.reload()
                         },1500);
