@@ -273,7 +273,7 @@ export function recaptcha_register_submit(token){
                 }
             },
             error: function(data) {
-                functions.showMessage(data.responseJSON.msg,'red');
+                functions.showMessage('The username and password\'s length should > 8','red');
             }
         });
     }
@@ -496,7 +496,9 @@ function addChallengeListener(){
         _attachements.empty();
         
         attachments.forEach(function(attachment){
-            $(`<div><a href="${attachment}">attachment</a></div>`).appendTo(_attachements);
+            if(attachment != ''){
+                $(`<div><a href="${attachment}">attachment</a></div>`).appendTo(_attachements);
+            }
         });
 
         console.log(hasContainer === 'true')
