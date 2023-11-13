@@ -477,13 +477,11 @@ function addChallengeListener(){
         */
         _modal.find('#instantiate').css('display','none');
         _modal.find('.instance-on').css('display','none');
-
+        _modal.find('#flag').text('');
         clearInterval(intervalHandler);
-
         _modal.find('#competition-name').html(`<h4>${challengeName}</h4>`);
         _modal.find('#nowscore').text(nowscore);
         _modal.find('#solved-times').text(solvedTimes);
-
 
         _modal.find('#competition-desc').text(desc);
 
