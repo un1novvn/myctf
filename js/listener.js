@@ -687,6 +687,7 @@ function showChallenges(uuid,appendTo){
             solveds.push(challenge.puuid)
         }
     }
+    console.log(solveds)
 
     // var nowscore = functions.get(route.nowscore.replace('{cuuid}',uuid),token).data
     
