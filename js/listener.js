@@ -115,8 +115,8 @@ export function addNavCompetitionListener(){
 
                     });
                     functions.hideLoadingSpinner();
-
                     addCompetitionPlayListener();
+                    addCompetitionScoreboardListener()
 
                 },
                 error: function() {
@@ -600,6 +600,9 @@ function addNavChallengesListener(){
 function addNavScoreboardListener(){
     var _challengePart = $('.challenge-part');
     $('a[href="#Scoreboard"]').click(function(){
+        functions.showMessage('Have not completed.','red')
+    })
+    $('a[href="#Noneeeeeeeeee"]').click(function(){
         var uuid = $('.competition-name').attr('competition-id')
         _challengePart.fadeOut('fast',function(){
             _challengePart.empty()
@@ -677,8 +680,15 @@ function addNavScoreboardListener(){
 
 function showChallenges(uuid,appendTo){
     var res = functions.get(route.getChallenges.replace('{uuid}',uuid),token)
-    var solveds = functions.get(route.getSolveds.replace('{cuuid}',uuid),token).data
-    var nowscore = functions.get(route.nowscore.replace('{cuuid}',uuid),token).data
+    var challenges = functions.get(route.getSolveds.replace('{cuuid}',uuid),token).data
+    var solveds = []
+    for(var challenge of challenges){
+        if(challenge.solved == true){
+            solveds.push(challenge.puuid)
+        }
+    }
+
+    // var nowscore = functions.get(route.nowscore.replace('{cuuid}',uuid),token).data
     
     if(res){
         var challenges = res.data;
@@ -714,17 +724,37 @@ function showChallenges(uuid,appendTo){
                     <div class="container" style="display:flex;width:100%;height:100%">
                         <div style="margin:auto auto">
                             <div style="text-align:center;font-size:1.4rem;">${challenge.name}</div>
-                            <div id="nowscore" style="text-align:center;">${nowscore[challenge.uuid].nowscore} pts</div>
-                            <div id="solved-times" style="text-align:center;">${nowscore[challenge.uuid].solvedTimes} solved</div>
                         </div>
                     </div>
                 </div>`)
+
+                // var _challenge = $(`<div class="${challengeClass}"\
+                // challenge-name="${challenge.name}"\
+                // challenge-id="${challenge.uuid}" \
+                // challenge-desc="${challenge.desc}" \
+                // challenge-attachment="${challenge.attachmenturls}" \
+                // challenge-has-container="${challenge.hasContainer}" \
+                // solved="${solved}">\
+                //     <div class="container" style="display:flex;width:100%;height:100%">
+                //         <div style="margin:auto auto">
+                //             <div style="text-align:center;font-size:1.4rem;">${challenge.name}</div>
+                //             <div id="nowscore" style="text-align:center;">${nowscore[challenge.uuid].nowscore} pts</div>
+                //             <div id="solved-times" style="text-align:center;">${nowscore[challenge.uuid].solvedTimes} solved</div>
+                //         </div>
+                //     </div>
+                // </div>`)
                 _challenge.appendTo(_challenges);
                 // 文字垂直水平居中
             }
             _challengeCategory.appendTo(appendTo)
         }
     }
+}
+
+function addCompetitionScoreboardListener(){
+    $('.competition-scoreboard').click(function(){
+        functions.showMessage('Have not completed.','red')
+    })
 }
 
 function addCompetitionPlayListener(){
@@ -753,15 +783,14 @@ function addCompetitionPlayListener(){
                         _content.empty();
                         _content.fadeOut('fast',function(){
         
-                            var userdata = functions.get(route.userdata.replace('{cuuid}',uuid),token).data
-                            
+                            // var userdata = functions.get(route.userdata.replace('{cuuid}',uuid),token).data
                             if(res){
 
                                 var _competitionMainPage = $(competitionMainPage);
                                 _competitionMainPage.find('.competition-name').text(competitionName);
-                                _competitionMainPage.find('#user-name').html(`<h5>Your name: ${functions.htmlEncode(userdata.username)}</h5>`)
-                                _competitionMainPage.find('#user-score').html(`<h5>Your score: ${userdata.score}</h5>`)
-                                _competitionMainPage.find('#user-rank').html(`<h5>Your rank: ${userdata.rank}</h5>`)
+                                // _competitionMainPage.find('#user-name').html(`<h5>Your name: ${functions.htmlEncode(userdata.username)}</h5>`)
+                                // _competitionMainPage.find('#user-score').html(`<h5>Your score: ${userdata.score}</h5>`)
+                                // _competitionMainPage.find('#user-rank').html(`<h5>Your rank: ${userdata.rank}</h5>`)
 
                                 var remainingTime = endTime-Date.now();
                                 console.log(endTime)
