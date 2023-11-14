@@ -91,6 +91,10 @@
                     <textarea type="text" class="form-control" aria-label="score" id="text-attachment" placeholder="urls should be divided with \n"></textarea>
                 </div>
 
+                <div class="input-group-text">
+                    <input type="checkbox" aria-label="Checkbox for following text input" id="challenge-hidden" value="">
+                    <div style="margin-left: 5%;">Challenge Hidden</div>
+                </div>
 
             </div>
 
@@ -399,6 +403,7 @@
                 _modal.find('#dynamic-score').prop('checked',challenge.dynamicscore);
                 _modal.find('#text-flag').val(challenge.flag?challenge.flag:'');
                 _modal.find('#dynamic-flag').prop('checked',challenge.flag =='');
+                _modal.find('#challenge-hidden').prop('checked',challenge.hidden);
                 _modal.find('#text-flag').attr('disabled',challenge.flag =='');
 
                 var attachments = ''
@@ -534,6 +539,7 @@
                 if(dynamicFlag.is(':checked')) challengeFlag = '';
 
                 var dynamicScore = _modal.find('#dynamic-score').is(':checked');
+                var challengeHidden = _modal.find('#challenge-hidden').is(':checked');
 
                 var data = {"name":challengeName,
                             "desc":challengeDesc,
@@ -542,7 +548,9 @@
                             "flag":challengeFlag,
                             "score":challengeScore,
                             "dynamicscore":true,
-                            "dockerurl":challengeDockerurl};
+                            "dockerurl":challengeDockerurl,
+                            "hidden":challengeHidden
+                        };
                 
 
                 var action = $(this).text();
