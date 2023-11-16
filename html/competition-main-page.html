@@ -44,7 +44,9 @@
                 <div class="d-flex justify-content-center" id="solved-times"></div>
                 <div style="margin-left: 3%; word-break:break-all;" id="competition-desc">descccccccccccccccccccccccccccc</div>
                 <div style="margin-left: 3%; word-break:break-all; " id="competition-attachments"><a href="#">attachment</a></div>
-                <form id="login-form" style="margin-top: 10%; margin-left: 3%; margin-right: 3%;">
+
+                <!-- 防止回车交表单，form改为form1 -->
+                <form1 id="flag-form" style="margin-top: 10%; margin-left: 3%; margin-right: 3%;">
                     <div class="form-group d-flex">
                         <input type="text" id="flag" name="flag" class="form-control" placeholder="flag">
                         <input type="button" id="submit-flag" value="submit" class="btn btn-primary">
@@ -64,10 +66,7 @@
                         <input type="button" id="destroy" value="Destroy" class="btn btn-danger instance-on" competition-id="" challenge-id="" style="display: none;">
                     </div>
 
-
-
-
-                </form>
+                </form1>
 
             </div>
         </div>

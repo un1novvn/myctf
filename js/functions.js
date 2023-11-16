@@ -143,3 +143,5 @@ export function hideMessage() {
 $('#message-box .close').click(function() {
     hideMessage();
 });
+
+

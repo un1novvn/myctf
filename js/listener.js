@@ -137,6 +137,9 @@ export function addNavLoginListener(){
         $('#content').fadeOut('fast', function() {
 
             $('#content').html(loginFormContent);
+
+            enterSubmitLogin()
+
             $('#content').fadeIn('fast');
             addLoginSubmitListener();
 
@@ -310,7 +313,7 @@ function addLoginSubmitListener(){
                         //登录成功
                         localStorage.setItem('token', data.data.token);
                         localStorage.setItem('isLoggedIn', true);
-    
+                        localStorage.setItem('expired', data.data.expire);
                         functions.showMessage('Login Success!','green');
                         setTimeout(function(){
                             location.reload();
@@ -595,9 +598,9 @@ function addNavChallengesListener(){
         _challengePart.fadeOut('fast',function(){
             _challengePart.empty()
             showChallenges(uuid,_challengePart)
+            addChallengeListener();
             _challengePart.fadeIn('fast')
         })
-        
     })
 }
 
@@ -682,6 +685,29 @@ function addNavScoreboardListener(){
 
 }
 
+function enterSubmitFlag(){
+
+    var _modal = $('#challenge-modal');
+    _modal.find('#flag').on('keydown',function(e){
+        if(e.key == 'Enter'){
+            _modal.find('#submit-flag').click()
+        }
+    })
+}
+
+function enterSubmitLogin(){
+
+    var _form = $('#login-form');
+    _form.find('#password').on('keydown',function(e){
+        if(e.key == 'Enter'){
+            _form.find('#submit').click()
+        }
+    })
+}
+
+
+
+
 function showChallenges(uuid,appendTo){
     var res = functions.get(route.getChallenges.replace('{uuid}',uuid),token)
     var challenges = functions.get(route.getSolveds.replace('{cuuid}',uuid),token).data
@@ -719,20 +745,6 @@ function showChallenges(uuid,appendTo){
                     solved = 'true'
                 }
 
-                var _challenge = $(`<div class="${challengeClass}"\
-                challenge-name="${challenge.name}"\
-                challenge-id="${challenge.uuid}" \
-                challenge-desc="${challenge.desc}" \
-                challenge-attachment="${challenge.attachmenturls}" \
-                challenge-has-container="${challenge.hasContainer}" \
-                solved="${solved}">\
-                    <div class="container" style="display:flex;width:100%;height:100%">
-                        <div style="margin:auto auto">
-                            <div style="text-align:center;font-size:1.4rem;">${challenge.name}</div>
-                        </div>
-                    </div>
-                </div>`)
-
                 // var _challenge = $(`<div class="${challengeClass}"\
                 // challenge-name="${challenge.name}"\
                 // challenge-id="${challenge.uuid}" \
@@ -743,11 +755,25 @@ function showChallenges(uuid,appendTo){
                 //     <div class="container" style="display:flex;width:100%;height:100%">
                 //         <div style="margin:auto auto">
                 //             <div style="text-align:center;font-size:1.4rem;">${challenge.name}</div>
-                //             <div id="nowscore" style="text-align:center;">${nowscore[challenge.uuid].nowscore} pts</div>
-                //             <div id="solved-times" style="text-align:center;">${nowscore[challenge.uuid].solvedTimes} solved</div>
                 //         </div>
                 //     </div>
                 // </div>`)
+
+                var _challenge = $(`<div class="${challengeClass}"\
+                challenge-name="${challenge.name}"\
+                challenge-id="${challenge.uuid}" \
+                challenge-desc="${challenge.desc}" \
+                challenge-attachment="${challenge.attachmenturls}" \
+                challenge-has-container="${challenge.hasContainer}" \
+                solved="${solved}">\
+                    <div class="container" style="display:flex;width:100%;height:100%">
+                        <div style="margin:auto auto">
+                            <div style="text-align:center;font-size:1.4rem;">${challenge.name}</div>
+                            <div id="nowscore" style="text-align:center;">${challenge.realscore} pts</div>
+                            <div id="solved-times" style="text-align:center;">${challenge.solvedTimes?challenge.solvedTimes:0} solved</div>
+                        </div>
+                    </div>
+                </div>`)
                 _challenge.appendTo(_challenges);
                 // 文字垂直水平居中
             }
@@ -825,6 +851,9 @@ function addCompetitionPlayListener(){
                                 addFlagSubmitListener();
                                 //销毁按钮
                                 addDestroyListener();
+
+                                // 监听回车提交flag
+                                enterSubmitFlag();
 
                                 _content.fadeIn('fast');
                             }
