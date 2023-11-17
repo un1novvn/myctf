@@ -558,25 +558,33 @@
                     data.uuid = $(this).attr('challenge-id');
                 }
 
-                $.ajax({
-                    url: route.addChallenge.replace('{uuid}',competitionId),
-                    method: 'POST',
-                    dataType: 'json',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type':'application/json'
-                    },
-                    data:JSON.stringify(data),
-                    success: function(res) {
-                        functions.hideLoadingSpinner();
-                        functions.showMessage(`${action} challenge success`,'green');
-
-                    },
-                    error: function(data) {
-                        functions.showMessage(data.responseJSON.msg,'red');
-                        functions.hideLoadingSpinner();
+                functions.fetchPost(route.addChallenge.replace('{uuid}',competitionId),data,token,function(data){
+                    if(data.code ==0){
+                        functions.showMessage(`${action} challenge success!`,'green')
+                    }else{
+                        functions.showMessage(data.msg,'red')
                     }
-                });
+                })
+
+                // $.ajax({
+                //     url: route.addChallenge.replace('{uuid}',competitionId),
+                //     method: 'POST',
+                //     dataType: 'json',
+                //     headers: {
+                //         'Authorization': 'Bearer ' + token,
+                //         'Content-Type':'application/json'
+                //     },
+                //     data:JSON.stringify(data),
+                //     success: function(res) {
+                //         functions.hideLoadingSpinner();
+                //         functions.showMessage(`${action} challenge success`,'green');
+
+                //     },
+                //     error: function(data) {
+                //         functions.showMessage(data.responseJSON.msg,'red');
+                //         functions.hideLoadingSpinner();
+                //     }
+                // });
 
             });
 

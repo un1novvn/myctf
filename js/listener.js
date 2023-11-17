@@ -572,16 +572,26 @@ function addFlagSubmitListener(){
 
         if(flag !== ''){
 
-            var res = functions.post(route.submitFlag.replace('{cuuid}',competitionId).replace('{puuid}',challengeId),{"flag":flag},token)
-            if(res){
-                functions.showMessage('flag correct!','green');
-                $(`.challenge[challenge-id="${challengeId}"]`).attr('class','challenge solved-challenge')
+            // var res = functions.post(route.submitFlag.replace('{cuuid}',competitionId).replace('{puuid}',challengeId),{"flag":flag},token)
 
-                setTimeout(function(){
-                    $('.competition-play[uuid=""]')
-                },1500)
+            functions.fetchPost(route.submitFlag.replace('{cuuid}',competitionId).replace('{puuid}',challengeId),{"flag":flag},token,function(data){
+                if(data.code ==0){
+                    functions.showMessage('flag correct!','green');
+                    $(`.challenge[challenge-id="${challengeId}"]`).attr('class','challenge solved-challenge')
+                }else{
+                    functions.showMessage(data.msg,'red')
+                }
+            })
 
-            }
+            // if(res){
+            //     functions.showMessage('flag correct!','green');
+            //     $(`.challenge[challenge-id="${challengeId}"]`).attr('class','challenge solved-challenge')
+
+            //     setTimeout(function(){
+            //         $('.competition-play[uuid=""]')
+            //     },1500)
+
+            // }
         }else{
             functions.showMessage('flag can not be empty','red')
         }
@@ -606,76 +616,112 @@ function addNavChallengesListener(){
 
 function addNavScoreboardListener(){
     var _challengePart = $('.challenge-part');
+
     $('a[href="#Scoreboard"]').click(function(){
-        functions.showMessage('Have not completed.','red')
-    })
-    $('a[href="#Noneeeeeeeeee"]').click(function(){
         var uuid = $('.competition-name').attr('competition-id')
         _challengePart.fadeOut('fast',function(){
             _challengePart.empty()
             var _scoreboard = $(scoreboardPage)
-            var _types = _scoreboard.find('#challenge-types')
+            // var _types = _scoreboard.find('#challenge-types')
             var _names = _scoreboard.find('#challenge-names')
             var body = _scoreboard.find('#scoreboard-body')
 
-            
-            var res = functions.get(route.getChallenges.replace('{uuid}',uuid),token)
-            var res2 = functions.get(route.scoreboard.replace('{cuuid}',uuid),token)
-            var rank = []
-            if(res2){
-                rank = res2.data
-            }
-            var challenges = []
-            if(res){
-                challenges = res.data
-            }
-            
-            var categories = {}
+
+            var res = functions.get(route.scoreboard.replace('{cuuid}',uuid),token)
+            var challenges = res.data.pmnamelist
+            var users = res.data.rankingList
             for(var challenge of challenges){
-                if(categories[challenge.type] === undefined){
-                    categories[challenge.type] = [] 
-                }
-                categories[challenge.type].push(challenge);
-                
+                $(`<td>${challenge}</td>`).appendTo(_names)
             }
-            var challengeIds = []
-            
-        
-            for(var category in categories){
-                var challenges = categories[category]
-                $(`<th scope="col" colspan="${challenges.length}">${category}</th>`).appendTo(_types)
-                for(var challenge of challenges){
-                    $(`<td>${challenge.name}</td>`).appendTo(_names)
-                    challengeIds.push(challenge.uuid)
-                }
-        
-            }
-            
-            for(var i in rank){
-        
-                var username = rank[i].username
-                var rnk = parseInt(i)+1
-                var score = rank[i].score
-                var item = $(`<tr><th scope="row">${functions.htmlEncode(username)}</th><td>${rnk}</td><td>${score}</td></tr>`)
-        
-                for(var challengeId of challengeIds){
-                    if(functions.inArray(challengeId,rank[i].solvedProblems)){
-                        if(functions.inArray(challengeId,rank[i].firstblood)){
-                            $('<td><img src="img/droplet-fill.svg" alt="Bootstrap" width="30px" height="30px"></td>').appendTo(item)
-                        }else if(functions.inArray(challengeId,rank[i].secondblood)){
-                            $('<td><img src="img/droplet-half.svg" alt="Bootstrap" width="30px" height="30px"></td>').appendTo(item)
-                        }else if(functions.inArray(challengeId,rank[i].thirdblood)){
-                            $('<td><img src="img/droplet.svg" alt="Bootstrap" width="30px" height="30px"></td>').appendTo(item)
-                        }else{
-                            $('<td><img src="img/bookmark-check.svg" alt="Bootstrap" width="30px" height="30px"></td>').appendTo(item)
+
+            for(var i in users){
+                var user = users[i]
+                var solveds = user.pmlist
+                var _item = $(`<tr><th scope="row">${functions.htmlEncode(user.username)}</th><td>${parseInt(i)+1}</td><td>${user.score}</td></tr>`)
+
+                for(var solved of solveds){
+                    if(solved != 0){
+                        var img
+                        switch(solved){
+                            case 1:
+                                img = '<td><img src="img/droplet-fill.svg" alt="Bootstrap" width="30px" height="30px"></td>'
+                                break
+                            case 2:
+                                img = '<td><img src="img/droplet-half.svg" alt="Bootstrap" width="30px" height="30px"></td>'
+                                break
+                            case 3:
+                                img = '<td><img src="img/droplet.svg" alt="Bootstrap" width="30px" height="30px"></td>'
+                                break
+                            default:
+                                img = '<td><img src="img/bookmark-check.svg" alt="Bootstrap" width="30px" height="30px"></td>'
                         }
+                        $(img).appendTo(_item)
                     }else{
-                        $('<td></td>').appendTo(item)
+                        $('<td></td>').appendTo(_item)
                     }
                 }
-        
-                item.appendTo(body)
+                
+                _item.appendTo(body)
+                // $(`<td>${challenge}</td>`).appendTo(_names)
             }
+
+            // var res = functions.get(route.getChallenges.replace('{uuid}',uuid),token)
+            // var res2 = functions.get(route.scoreboard.replace('{cuuid}',uuid),token)
+            // var rank = []
+            // if(res2){
+            //     rank = res2.data
+            // }
+            // var challenges = []
+            // if(res){
+            //     challenges = res.data
+            // }
+            
+            // var categories = {}
+            // for(var challenge of challenges){
+            //     if(categories[challenge.type] === undefined){
+            //         categories[challenge.type] = [] 
+            //     }
+            //     categories[challenge.type].push(challenge);
+                
+            // }
+            // var challengeIds = []
+            
+        
+            // for(var category in categories){
+            //     var challenges = categories[category]
+            //     $(`<th scope="col" colspan="${challenges.length}">${category}</th>`).appendTo(_types)
+            //     for(var challenge of challenges){
+            //         $(`<td>${challenge.name}</td>`).appendTo(_names)
+            //         challengeIds.push(challenge.uuid)
+            //     }
+        
+            // }
+            
+            // for(var i in rank){
+        
+            //     var username = rank[i].username
+            //     var rnk = parseInt(i)+1
+            //     var score = rank[i].score
+            //     var item = $(`<tr><th scope="row">${functions.htmlEncode(username)}</th><td>${rnk}</td><td>${score}</td></tr>`)
+        
+            //     for(var challengeId of challengeIds){
+            //         if(functions.inArray(challengeId,rank[i].solvedProblems)){
+            //             if(functions.inArray(challengeId,rank[i].firstblood)){
+            //                 $('<td><img src="img/droplet-fill.svg" alt="Bootstrap" width="30px" height="30px"></td>').appendTo(item)
+            //             }else if(functions.inArray(challengeId,rank[i].secondblood)){
+            //                 $('<td><img src="img/droplet-half.svg" alt="Bootstrap" width="30px" height="30px"></td>').appendTo(item)
+            //             }else if(functions.inArray(challengeId,rank[i].thirdblood)){
+            //                 $('<td><img src="img/droplet.svg" alt="Bootstrap" width="30px" height="30px"></td>').appendTo(item)
+            //             }else{
+            //                 $('<td><img src="img/bookmark-check.svg" alt="Bootstrap" width="30px" height="30px"></td>').appendTo(item)
+            //             }
+            //         }else{
+            //             $('<td></td>').appendTo(item)
+            //         }
+            //     }
+        
+            //     item.appendTo(body)
+            // }
 
             _scoreboard.appendTo(_challengePart)
             _challengePart.fadeIn('fast')

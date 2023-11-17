@@ -36,6 +36,21 @@ export function get(url,token){
     return ret
 }
 
+export async function fetchPost(url,data,token,callback){
+    fetch(url, {
+        method: "POST", // *GET, POST, PUT, DELETE, etc.
+        headers: {
+            "Authorization":"Bearer "+token,
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(data), // body data type must match "Content-Type" header
+    })
+    .then((response)=>response.json())
+    .then(callback)
+}
+
+
 // data: an object
 export function post(url,data,token){
     var headers = {'Content-Type':'application/json'}
