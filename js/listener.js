@@ -814,7 +814,7 @@ function showChallenges(uuid,appendTo){
                 solved="${solved}">\
                     <div class="container" style="display:flex;width:100%;height:100%">
                         <div style="margin:auto auto">
-                            <div style="text-align:center;font-size:1.4rem;">${challenge.name}</div>
+                            <div style="text-align:center;font-size:1.4rem;word-break:break-all;">${challenge.name}</div>
                             <div id="nowscore" style="text-align:center;">${challenge.realscore} pts</div>
                             <div id="solved-times" style="text-align:center;">${challenge.solvedTimes?challenge.solvedTimes:0} solved</div>
                         </div>
